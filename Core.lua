@@ -587,6 +587,7 @@ local function unit_event(tag,event,unit)
 	end
 end
 
+local has_absort_event = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 local crf_frame
 
 function CRaidFrame.Update()
@@ -681,14 +682,16 @@ function CRaidFrame.Update()
 		CRaidFrame:RegisterEvent("UNIT_FLAGS",unit_event,0)
 		CRaidFrame:RegisterEvent("UNIT_HEALTH", unit_event,1)
 		CRaidFrame:RegisterEvent("UNIT_MAXHEALTH", unit_event,1)
-		CRaidFrame:RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED",unit_event,1)
-		CRaidFrame:RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED",unit_event,1)
+		if has_absort_event then
+			CRaidFrame:RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED",unit_event,1)
+			CRaidFrame:RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED",unit_event,1)
+			CRaidFrame:RegisterEvent("UNIT_HEAL_PREDICTION",unit_event,1)
+		end
 		if profile.resourcebar~=false then
 			CRaidFrame:RegisterEvent("UNIT_POWER_UPDATE",unit_event,2)
 			CRaidFrame:RegisterEvent("UNIT_MAXPOWER",unit_event,2)
 			CRaidFrame:RegisterEvent("UNIT_POWER_FREQUENT",unit_event,2)
 		end
-		CRaidFrame:RegisterEvent("UNIT_HEAL_PREDICTION",unit_event,1)
 		local v = 0
 		if not profile.disable_unit_aura then
 			CRaidFrame:RegisterEvent("UNIT_AURA",unit_event,3)

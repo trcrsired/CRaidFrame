@@ -1,4 +1,5 @@
 local CRaidFrame = LibStub("AceAddon-3.0"):NewAddon("CRaidFrame","AceConsole-3.0","AceEvent-3.0")
+CRaidFrame.version_has_dual_spec = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE or WOW_PROJECT_ID >= WOW_PROJECT_WRATH_CLASSIC
 
 function CRaidFrame:OnInitialize()
 	local LSM = LibStub("LibSharedMedia-3.0")
@@ -27,12 +28,14 @@ function CRaidFrame:OnInitialize()
 			[2] = nulltb
 		}
 	})
-	local LibDualSpec = LibStub('LibDualSpec-1.0',true)
-	if LibDualSpec == nil then
-		LoadAddOn('LibDualSpec-1.0')
-		LibDualSpec = LibStub('LibDualSpec-1.0')
+	if CRaidFrame.version_has_dual_spec then
+		local LibDualSpec = LibStub('LibDualSpec-1.0',true)
+		if LibDualSpec == nil then
+			LoadAddOn('LibDualSpec-1.0')
+			LibDualSpec = LibStub('LibDualSpec-1.0')
+		end
+		LibDualSpec:EnhanceDatabase(self.db, "CRaidFrame")
 	end
-	LibDualSpec:EnhanceDatabase(self.db, "CRaidFrame")
 	self:RegisterChatCommand("CRaidFrame", "ChatCommand")
 	self:RegisterChatCommand("CRF", "ChatCommand")
 --	self:RegisterEvent("GROUP_ROSTER_UPDATE")

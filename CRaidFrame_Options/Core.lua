@@ -71,7 +71,9 @@ end
 
 function CRaidFrame_Options:OnInitialize()
 	local profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(CRaidFrame.db)
-	LibStub('LibDualSpec-1.0'):EnhanceOptions(profile, CRaidFrame.db)
+	if CRaidFrame.version_has_dual_spec then
+		LibStub('LibDualSpec-1.0'):EnhanceOptions(profile, CRaidFrame.db)
+	end
 	profile.order = -1
 	if CRaidFrame.Update then
 		CRaidFrame.db.RegisterCallback(CRaidFrame, "OnProfileChanged", "Update")
@@ -179,7 +181,6 @@ function CRaidFrame_Options:OnInitialize()
 					update_crf()
 				end
 			},
-			reset = reset_idf,
 			enable =
 			{
 				name = ENABLE,
