@@ -199,7 +199,7 @@ local function update(self,tag)
 		if resource_bar_healer_only~=nil then
 			local roleishealer
 			if UnitGroupRolesAssigned then
-				roleishealer = UnitGroupRolesAssigned(unit)
+				roleishealer = UnitGroupRolesAssigned(unit) == "HEALER"
 			else
 				roleishealer = true
 			end
