@@ -1,5 +1,4 @@
 local CRaidFrame = LibStub("AceAddon-3.0"):NewAddon("CRaidFrame","AceConsole-3.0","AceEvent-3.0")
-CRaidFrame.version_has_dual_spec = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE or WOW_PROJECT_ID >= WOW_PROJECT_WRATH_CLASSIC
 
 function CRaidFrame:OnInitialize()
 	local LSM = LibStub("LibSharedMedia-3.0")
@@ -28,12 +27,8 @@ function CRaidFrame:OnInitialize()
 			[2] = nulltb
 		}
 	})
-	if CRaidFrame.version_has_dual_spec then
-		local LibDualSpec = LibStub('LibDualSpec-1.0',true)
-		if LibDualSpec == nil then
-			LoadAddOn('LibDualSpec-1.0')
-			LibDualSpec = LibStub('LibDualSpec-1.0')
-		end
+	local LibDualSpec = LibStub('LibDualSpec-1.0',true)
+	if LibDualSpec then
 		LibDualSpec:EnhanceDatabase(self.db, "CRaidFrame")
 	end
 	self:RegisterChatCommand("CRaidFrame", "ChatCommand")

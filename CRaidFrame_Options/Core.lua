@@ -71,8 +71,9 @@ end
 
 function CRaidFrame_Options:OnInitialize()
 	local profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(CRaidFrame.db)
-	if CRaidFrame.version_has_dual_spec then
-		LibStub('LibDualSpec-1.0'):EnhanceOptions(profile, CRaidFrame.db)
+	local LibDualSpec = LibStub('LibDualSpec-1.0',true)
+	if LibDualSpec then
+		LibDualSpec:EnhanceOptions(profile, CRaidFrame.db)
 	end
 	profile.order = -1
 	if CRaidFrame.Update then
@@ -1201,23 +1202,6 @@ function CRaidFrame_Options:OnInitialize()
 						get = function()
 							return not CRaidFrame.db.profile.event
 						end
-					},
-					unit_health_frequent =
-					{
-						name = "UNIT_HEALTH_FREQUENT",
-						type = "toggle",
-						set = function(t,val)
-							if val then
-								CRaidFrame.db.profile.disable_unit_health_frequent = nil
-							else
-								CRaidFrame.db.profile.disable_unit_health_frequent = true
-							end
-							update_crf()
-						end,
-						get = function(t)
-							return not CRaidFrame.db.profile.disable_unit_health_frequent
-						end,
-						width = "full"
 					},
 					unit_aura =
 					{

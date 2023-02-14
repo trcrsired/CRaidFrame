@@ -170,6 +170,10 @@ local buffs,bf
 local debuffs,df
 local simple
 
+local UnitGroupRolesAssigned = UnitGroupRolesAssigned
+local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
+local UnitGetTotalHealAbsorbs = UnitGetTotalHealAbsorbs
+
 local function update(self,tag)
 	local unit = self:GetAttribute("unit")
 	self.unit = unit
@@ -193,8 +197,13 @@ local function update(self,tag)
 			return
 		end
 		if resource_bar_healer_only~=nil then
-			local role = UnitGroupRolesAssigned(unit)
-			if role == "HEALER" then
+			local roleishealer
+			if UnitGroupRolesAssigned then
+				roleishealer = UnitGroupRolesAssigned(unit)
+			else
+				roleishealer = true
+			end
+			if roleishealer then
 				if resource_bar_healer_only then
 					statusbar:SetPoint("TOPRIGHT",resourcebar,"TOPLEFT")
 					statusbar:SetPoint("BOTTOMRIGHT",resourcebar,"BOTTOMLEFT")
@@ -216,7 +225,10 @@ local function update(self,tag)
 		end
 	end
 	if tag == 4 or tag < 2 then
-		local in_different_phase = UnitPhaseReason(unit)
+		local in_different_phase
+		if UnitPhaseReason then
+			in_different_phase = UnitPhaseReason(unit)
+		end
 		local alpha
 		if in_different_phase or not UnitIsFriend("player",unit) then
 			alpha = 0.1
@@ -254,18 +266,20 @@ local function update(self,tag)
 			end
 			local role
 			if not simple then
-				role = UnitGroupRolesAssigned(unit)
-				if role then
-					if role == "TANK" then
-						if resource_bar_healer_only == nil then
-							text_ctb[#text_ctb+1] = "\n|T337497:16:16:0:0:64:64:0:19:22:41|t"
+				if UnitGroupRolesAssigned then
+					role = UnitGroupRolesAssigned(unit)
+					if role then
+						if role == "TANK" then
+							if resource_bar_healer_only == nil then
+								text_ctb[#text_ctb+1] = "\n|T337497:16:16:0:0:64:64:0:19:22:41|t"
+							else
+								text_ctb[#text_ctb+1] = "\n|T337497:16:16:0:0:64:64:0:19:22:41|t"
+							end
+						elseif role == "HEALER" and resource_bar_healer_only == nil then
+							text_ctb[#text_ctb+1] = "\n|T337497:16:16:0:0:64:64:20:39:1:20|t"
 						else
-							text_ctb[#text_ctb+1] = "\n|T337497:16:16:0:0:64:64:0:19:22:41|t"
+							role = nil
 						end
-					elseif role == "HEALER" and resource_bar_healer_only == nil then
-						text_ctb[#text_ctb+1] = "\n|T337497:16:16:0:0:64:64:20:39:1:20|t"
-					else
-						role = nil
 					end
 				end
 				if UnitIsGroupLeader(unit) then
@@ -302,9 +316,12 @@ local function update(self,tag)
 				text_ctb[#text_ctb+1] = '\n'
 				text_ctb[#text_ctb+1] = PLAYER_OFFLINE
 			end
-			local healthmax = UnitHealthMax(unit) + UnitGetTotalHealAbsorbs(unit)
+			local healthmax = UnitHealthMax(unit)
+			if UnitGetTotalHealAbsorbs then
+				healthmax = healthmax + UnitGetTotalHealAbsorbs(unit)
+			end
 			local health = UnitHealth(unit)
-			local absorbs = UnitGetTotalAbsorbs(unit)
+			local absorbs = UnitGetTotalAbsorbs and UnitGetTotalAbsorbs(unit) or 0
 			if not simple then
 				if dead then
 					if UnitHasIncomingResurrection(unit) then
