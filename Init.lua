@@ -35,6 +35,10 @@ function CRaidFrame:OnInitialize()
 	self:RegisterChatCommand("CRF", "ChatCommand")
 --	self:RegisterEvent("GROUP_ROSTER_UPDATE")
 --	self:RegisterEvent("PLAYER_REGEN_ENABLED","GROUP_ROSTER_UPDATE")
+	if not self.db.profile.enable_blizzardcompactraidframes then
+		self:RegisterEvent("ADDON_LOADED")
+		CRaidFrame:ADDON_LOADED("ADDON_LOADED","Blizzard_CompactRaidFrames")
+	end
 	local LoadAddOn = LoadAddOn
 	local class = select(2,UnitClass("player"))
 	for i = 1, GetNumAddOns() do
@@ -67,4 +71,24 @@ end
 
 function CRaidFrame:ChatCommand(input)
 	self:SendMessage("CRF_ChatCommand",input)
+end
+
+function CRaidFrame:ADDON_LOADED(_,addonname)
+	if addonname ~= "Blizzard_CompactRaidFrames" then
+		return
+	end
+	if not self.db.profile.enable_blizzardcompactraidframes then
+		local CompactRaidFrameManager = CompactRaidFrameManager
+		if CompactRaidFrameManager then
+			local UIHider = CRaidFrame.UIHider
+			if UIHider == nil then
+				UIHider = CreateFrame("Frame")
+				UIHider:Hide()
+				CRaidFrame.UIHider = UIHider
+			end
+			CompactRaidFrameManager:SetParent(UIHider)
+			CompactRaidFrameManager:UnregisterAllEvents()
+			self:UnregisterEvent("ADDON_LOADED")
+		end
+	end
 end

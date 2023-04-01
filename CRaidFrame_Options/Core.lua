@@ -4,9 +4,15 @@ local CRaidFrame = AceAddon:GetAddon("CRaidFrame")
 local CRaidFrame_Options = AceAddon:NewAddon("CRaidFrame_Options")
 local L = LibStub("AceLocale-3.0"):GetLocale("CRaidFrame")
 
-local rswidth,rsheight = GetCVar("gxFullscreenResolution"):match("(%d+)x(%d+)")
+local rswidth,rsheight
+
+if GetCurrentScaledResolution then
+rswidth,rsheight=GetCurrentScaledResolution()
+else
+rswidth,rsheight = GetCVar("gxFullscreenResolution"):match("(%d+)x(%d+)")
 rswidth = tonumber(rswidth)
 rsheight = tonumber(rsheight)
+end
 
 local order = 0
 
@@ -535,21 +541,15 @@ function CRaidFrame_Options:OnInitialize()
 						name = "Blizzard Compact Raid Frames",
 						type = "toggle",
 						get = function()
-							return IsAddOnLoaded("Blizzard_CompactRaidFrames")
+							return CRaidFrame.db.profile.enable_blizzardcompactraidframes
 						end,
-						confirm = true,
 						set = function(_,v)
-							local loaded = IsAddOnLoaded("Blizzard_CompactRaidFrames")
-							local func
-							if loaded then
-								func = DisableAddOn
-							else
-								func = EnableAddOn
+							if not v then
+								v = nil
 							end
-							func("Blizzard_CompactRaidFrames")
-							func("Blizzard_CUFProfiles")
-							ReloadUI()
-						end						
+							CRaidFrame.db.profile.enable_blizzardcompactraidframes = v
+							CRaidFrame:ADDON_LOADED("ADDON_LOADED","Blizzard_CompactRaidFrames")
+						end				
 					},
 				}
 			},

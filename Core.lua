@@ -776,6 +776,7 @@ function CRaidFrame:OnEnable()
 		profile.left,profile.bottom = left,bottom
 	end)
 	crf_frame:SetScript("OnDragStop", crf_frame.StopMoving)
+	local show_solo = not CRaidFrame.db.profile.show_solo
 	for i=1,8 do
 		local ele = CreateFrame("Frame", "CRaidFrame"..i, crf_frame, "SecureGroupHeaderTemplate")
 		ele:SetAttribute("template", "SecureUnitButtonTemplate")
