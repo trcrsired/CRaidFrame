@@ -9,8 +9,8 @@ function CRaidFrame:OnInitialize()
 		{
 			bottom = 370,
 			left = 0,
-			width = 90,
-			height = 80,
+			width = 70,
+			height = 60,
 			refresh_rate = 0.05,
 			font_size = 12,
 			resourcebar_length = 10,
