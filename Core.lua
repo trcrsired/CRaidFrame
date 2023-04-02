@@ -604,7 +604,10 @@ local function unit_event(tag,event,unit)
 	end
 end
 
-local has_absort_event = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+local has_absort_event
+if UnitGetTotalAbsorbs then
+	has_absort_event = true
+end
 local crf_frame
 
 function CRaidFrame.Update()
