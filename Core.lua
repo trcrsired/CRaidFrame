@@ -757,9 +757,14 @@ function CRaidFrame:OnEnable()
 		self:StopMovingOrSizing()
 		local left,bottom=self:GetLeft(),self:GetBottom()
 		local profile = CRaidFrame.db.profile
-		local rswidth,rsheight = GetCVar("gxFullscreenResolution"):match("(%d+)x(%d+)")
+		local rswidth,rsheight
+		if GetCurrentScaledResolution then
+		rswidth,rsheight=GetCurrentScaledResolution()
+		else
+		rswidth,rsheight = GetCVar("gxFullscreenResolution"):match("(%d+)x(%d+)")
 		rswidth = tonumber(rswidth)
 		rsheight = tonumber(rsheight)
+		end
 		local anchor = profile.anchor
 		if anchor == 1 then
 			bottom = rsheight - bottom
@@ -790,6 +795,7 @@ function CRaidFrame:OnEnable()
 		ele:Show()
 		crf_frame[i] = ele
 	end
+	CRaidFrame.crf_frame = crf_frame	-- allow other addons to access crf_frame
 	CRaidFrame.Update()
 	self.OnInitialize = nil
 	self.OnEnable = nil
