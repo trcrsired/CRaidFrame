@@ -640,12 +640,12 @@ function CRaidFrame.Update()
 		harmfulfilter = "HARMFUL"
 	end
 	if profile.castablebuffsonly then
-		helpfulfilter = "HELPFUL|RAID"
+		helpfulfilter = "HELPFUL|RAID|"
 	else
 		helpfulfilter = "HELPFUL"
 	end
 	if not profile.notplayerbuffsonly then
-		helpfulfilter = helpfulfilter .. "|PLAYER"		
+		helpfulfilter = helpfulfilter .. "|PLAYER"
 	end
 	local width,height = profile.width,profile.height
 	local LSM = LibStub("LibSharedMedia-3.0")

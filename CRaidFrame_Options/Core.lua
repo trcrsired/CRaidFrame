@@ -1160,6 +1160,24 @@ function CRaidFrame_Options:OnInitialize()
 						end,
 						width = "full"
 					},
+					notplayerbuffsonly =
+					{
+						name = L.playerbuffsonly_name,
+						desc = L.playerbuffsonly_desc,
+						type = "toggle",
+						set = function(_,val)
+							if val then
+								CRaidFrame.db.profile.notplayerbuffsonly = nil
+							else
+								CRaidFrame.db.profile.notplayerbuffsonly = true
+							end
+							update_crf()
+						end,
+						get = function()
+							return not CRaidFrame.db.profile.notplayerbuffsonly
+						end,
+						width = "full"
+					},
 					dispellabledebuffsonly =
 					{
 						name = COMPACT_UNIT_FRAME_PROFILE_DISPLAYONLYDISPELLABLEDEBUFFS,
