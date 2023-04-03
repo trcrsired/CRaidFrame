@@ -1114,6 +1114,70 @@ function CRaidFrame_Options:OnInitialize()
 							return CRaidFrame.db.profile.debuffs
 						end
 					},
+					buffs = 
+					{
+						name = SHOW_BUFFS,
+						type = "range",
+						min = 3,
+						max = 10,
+						step = 1,
+						set = function(_,val)
+							CRaidFrame.db.profile.buffs = val
+						end,
+						get = function()
+							return CRaidFrame.db.profile.buffs
+						end
+					},
+					debuffs = 
+					{
+						name = SHOW_DEBUFFS,
+						type = "range",
+						min = 3,
+						max = 10,
+						step = 1,
+						set = function(_,val)
+							CRaidFrame.db.profile.debuffs = val
+						end,
+						get = function()
+							return CRaidFrame.db.profile.debuffs
+						end
+					},
+					castablebuffsonly =
+					{
+						name = L.castablebuffsonly_name,
+						desc = L.castablebuffsonly_desc,
+						type = "toggle",
+						set = function(_,val)
+							if val then
+								CRaidFrame.db.profile.castablebuffsonly = true
+							else
+								CRaidFrame.db.profile.castablebuffsonly = nil
+							end
+							update_crf()
+						end,
+						get = function()
+							return not CRaidFrame.db.profile.castablebuffsonly
+						end,
+						width = "full"
+					},
+					dispellabledebuffsonly =
+					{
+						name = COMPACT_UNIT_FRAME_PROFILE_DISPLAYONLYDISPELLABLEDEBUFFS,
+						desc = OPTION_TOOLTIP_COMPACT_UNIT_FRAME_PROFILE_DISPLAYONLYDISPELLABLEDEBUFFS,
+						type = "toggle",
+						set = function(_,val)
+							if val then
+								CRaidFrame.db.profile.dispellabledebuffsonly = true
+							else
+								CRaidFrame.db.profile.dispellabledebuffsonly = nil
+							end
+							update_crf()
+						end,
+						get = function()
+							return CRaidFrame.db.profile.dispellabledebuffsonly
+						end,
+						width = "full"
+					},
 					reloadui = reloadui
 				}
 			},

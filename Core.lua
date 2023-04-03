@@ -1,4 +1,3 @@
-
 local UnitExists = UnitExists
 local UnitClass = UnitClass
 local UnitHealth = UnitHealth
@@ -200,6 +199,9 @@ local buffs,bf
 local debuffs,df
 local simple
 
+local harmfulfilter
+local helpfulfilter
+
 local function update_auras(unit,tb,dispeldebuff)
 	wipe(aura_filters)
 	local require_sort = false
@@ -207,9 +209,9 @@ local function update_auras(unit,tb,dispeldebuff)
 	local filter
 	local isplayer
 	if dispeldebuff then
-		filter = "HARMFUL"
+		filter = harmfulfilter
 	else
-		filter = "PLAYER|HELPFUL"
+		filter = helpfulfilter
 		isplayer = UnitIsUnit(unit,"player")
 	end
 	while true do
@@ -630,6 +632,17 @@ function CRaidFrame.Update()
 	local profile = CRaidFrame.db.profile
 	if profile.release then
 		CRaidFrame.Update = nil
+	end
+
+	if profile.dispellabledebuffsonly then
+		harmfulfilter = "HARMFUL|RAID"
+	else
+		harmfulfilter = "HARMFUL"
+	end
+	if profile.castablebuffsonly then
+		helpfulfilter = "PLAYER|HELPFUL|RAID"
+	else
+		helpfulfilter = "PLAYER|HELPFUL"
 	end
 	local width,height = profile.width,profile.height
 	local LSM = LibStub("LibSharedMedia-3.0")
