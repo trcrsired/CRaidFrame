@@ -1156,7 +1156,7 @@ function CRaidFrame_Options:OnInitialize()
 							update_crf()
 						end,
 						get = function()
-							return not CRaidFrame.db.profile.castablebuffsonly
+							return CRaidFrame.db.profile.castablebuffsonly
 						end,
 						width = "full"
 					},
