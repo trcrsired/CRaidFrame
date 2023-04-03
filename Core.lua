@@ -1,3 +1,45 @@
+
+local UnitExists = UnitExists
+local UnitClass = UnitClass
+local UnitHealth = UnitHealth
+local UnitHealthMax = UnitHealthMax
+local CLASS_COLORS = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
+local table_concat = table.concat
+local wipe = wipe
+local UnitIsUnit = UnitIsUnit
+local UnitPhaseReason = UnitPhaseReason
+local math_floor = math.floor
+local text_ctb = {}
+local self_buff
+local GHOST = GetSpellInfo(8326)
+local aura_filters = {}
+local resource_bar_healer_only
+local UnitIsFriend = UnitIsFriend
+local CheckInteractDistance = CheckInteractDistance
+local UnitInRange = UnitInRange
+local IsItemInRange = IsItemInRange
+local UnitName = UnitName
+local UnitIsGhost = UnitIsGhost
+local UnitIsDead = UnitIsDead
+local UnitIsGroupLeader = UnitIsGroupLeader
+local GetRaidTargetIndex = GetRaidTargetIndex
+local UnitHasIncomingResurrection = UnitHasIncomingResurrection
+local UnitGetIncomingHeals = UnitGetIncomingHeals
+local GetReadyCheckStatus = GetReadyCheckStatus
+local UnitPowerType = UnitPowerType
+local UnitPowerMax = UnitPowerMax
+local UnitPower = UnitPower
+local UnitIsConnected = UnitIsConnected
+local UnitGroupRolesAssigned = UnitGroupRolesAssigned
+local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
+local UnitGetTotalHealAbsorbs = UnitGetTotalHealAbsorbs
+local UnitAura = UnitAura
+local lshift = bit.lshift
+local band = bit.band
+local table_sort = table.sort
+local tonumber = tonumber
+local CreateFrame = CreateFrame
+
 local CRaidFrame = LibStub("AceAddon-3.0"):GetAddon("CRaidFrame")
 
 local function aura_onenter(self)
@@ -7,7 +49,7 @@ local function aura_onenter(self)
 	end
 end
 
-local function aura_onleave(self)
+local function aura_onleave()
 	GameTooltip:Hide()
 end
 
@@ -144,37 +186,127 @@ local function config_unitbutton(frame,secure)
 		dispel:SetPoint("RIGHT",statusbar,"RIGHT")
 	end
 
-	local mn = min(height,width) / 4
+	local mn = width
+	if height < mn then
+		mn = height
+	end
+	mn = mn / 4
 	dispel:SetSize(mn,mn)
 	dispel[1]:SetAllPoints(dispel)
 	CRaidFrame:SendMessage("CRFCfg",frame,profile)
 end
 
-local UnitExists = UnitExists
-local UnitClass = UnitClass
-local UnitHealth = UnitHealth
-local UnitHealthMax = UnitHealthMax
-local CLASS_COLORS = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
-local table_concat = table.concat
-local wipe = wipe
-local UnitIsUnit = UnitIsUnit
-local UnitPhaseReason = UnitPhaseReason
-local math_floor = math.floor
-local text_ctb = {}
-local self_buff
-local GHOST = GetSpellInfo(8326)
-local aura_filters = {}
-local resource_bar_healer_only
-local UnitIsFriend = UnitIsFriend
-
 local buffs,bf
 local debuffs,df
 local simple
 
-
-local UnitGroupRolesAssigned = UnitGroupRolesAssigned
-local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
-local UnitGetTotalHealAbsorbs = UnitGetTotalHealAbsorbs
+local function update_auras(unit,tb,dispeldebuff)
+	wipe(aura_filters)
+	local require_sort = false
+	local aurai = 1
+	local filter
+	local isplayer
+	if dispeldebuff then
+		filter = "HARMFUL"
+	else
+		filter = "PLAYER|HELPFUL"
+		isplayer = UnitIsUnit(unit,"player")
+	end
+	while true do
+		local name, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID,canApplyAura, isBossDebuff = UnitAura(unit,aurai,filter)
+		if name then
+			if duration and expires and 0 <= duration then
+				if dispeldebuff then
+					local v = debuffs[spellID]
+					if df then
+						if v then
+							aura_filters[#aura_filters+1] = lshift(v,25) + aurai
+							require_sort = require_sort or v~=0
+						end
+					else
+						if v ~= 0 then
+							local t = aurai
+							if v then
+								t = t + lshift(v,25)
+								require_sort = true
+							end
+							aura_filters[#aura_filters+1] = t
+						end
+					end
+				else
+					local v = buffs[spellID]
+					if bf then
+						if v then
+							local temp
+							if v == 0 then
+								temp = 2113929216 + aurai
+							else
+								temp = lshift(63-v,25) + aurai
+								require_sort = true
+							end
+							aura_filters[#aura_filters+1] = temp
+						end
+					else
+						if v ~= 0 and (isBossDebuff or (caster == "player" and (not isplayer or self_buff[spellID]))) then
+							local temp
+							if v then
+								temp = lshift(63-v,25) + aurai
+								require_sort = true
+							else
+								temp = 2113929216 + aurai
+							end
+							aura_filters[#aura_filters+1] = temp
+							self_buff[spellID] = true
+						end
+					end
+				end
+				
+			end
+		else
+			break
+		end
+		aurai = aurai + 1
+	end
+	if require_sort then
+		table_sort(aura_filters)
+	end
+	local sdbf
+	local n = #tb
+	local naura_filters = #aura_filters
+	if naura_filters < n then
+		n = naura_filters
+	end
+	local j = 1
+	for i=1,n do
+		local ai = band(aura_filters[i],33554431)
+		local name, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID,canApplyAura, isBossDebuff = UnitAura(unit,ai,filter)
+		local t
+		if dispeldebuff and dispelType and (not sdbf) then
+			t = dispeldebuff
+			sdbf = spellID
+		else
+			t = tb[j]
+			j = j + 1
+		end
+		t:SetCooldown(expires-duration,duration)
+		local t1 = t[1]
+		t1:SetTexture(icon)
+		t[2] = unit
+		t[3] = ai
+		t[4] = filter
+		t1:Show()
+		t:Show()
+	end
+	for i=j,#tb do
+		local tbi = tb[i]
+		tbi:Hide()
+		tbi[1]:Hide()
+	end
+	if dispeldebuff and not sdbf then
+		dispeldebuff:Hide()
+		dispeldebuff[1]:Hide()
+	end
+end
 
 local function update(self,tag)
 	local unit = self:GetAttribute("unit")
@@ -272,11 +404,7 @@ local function update(self,tag)
 					role = UnitGroupRolesAssigned(unit)
 					if role then
 						if role == "TANK" then
-							if resource_bar_healer_only == nil then
-								text_ctb[#text_ctb+1] = "\n|T337497:16:16:0:0:64:64:0:19:22:41|t"
-							else
-								text_ctb[#text_ctb+1] = "\n|T337497:16:16:0:0:64:64:0:19:22:41|t"
-							end
+							text_ctb[#text_ctb+1] = "\n|T337497:16:16:0:0:64:64:0:19:22:41|t"
 						elseif role == "HEALER" and resource_bar_healer_only == nil then
 							text_ctb[#text_ctb+1] = "\n|T337497:16:16:0:0:64:64:20:39:1:20|t"
 						else
@@ -381,131 +509,8 @@ local function update(self,tag)
 		resourcebar:SetValue(UnitPower(unit))
 	end
 	if tag == -1 or tag == 3 then
-		local band = bit.band
-		local i = 1
-		wipe(aura_filters)
-		local lshift = bit.lshift
-		local isplayer = UnitIsUnit(unit,"player")
-		local require_sort = false
-		local UnitBuff,UnitDebuff = UnitBuff,UnitDebuff
-		while true do
-			local name, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID,canApplyAura, isBossDebuff =UnitBuff(unit,i,"PLAYER")
-			if name then
-				if duration and expires and 0 <= duration then
-					local v = buffs[spellID]
-					if bf then
-						if v then
-							if v == 0 then
-								aura_filters[#aura_filters+1] = 2113929216 + i
-							else
-								aura_filters[#aura_filters+1] = lshift(63-v,25) + i
-								require_sort = true
-							end
-						end
-					else
-						if v ~= 0 and (isBossDebuff or (caster == "player" and (not isplayer or self_buff[spellID]))) then
-							if v then
-								aura_filters[#aura_filters+1] = lshift(63-v,25) + i
-								require_sort = true
-							else
-								aura_filters[#aura_filters+1] = 2113929216 + i
-							end
-							self_buff[spellID] = true
-						end
-					end
-				end
-			else
-				break
-			end
-			i = i + 1
-		end
-		if require_sort then
-			table.sort(aura_filters)
-		end
-		local tb = self[6]
-		local n = min(#tb,#aura_filters)
-		for i=1,n do
-			local ai = band(aura_filters[i],33554431)
-			local name, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID,canApplyAura, isBossDebuff =UnitBuff(unit,ai,"PLAYER")
-			local t = tb[i]
-			t:SetCooldown(expires-duration,duration)
-			t[1]:SetTexture(icon)
-			t[2] = unit
-			t[3] = ai
-			t[4] = "PLAYER"
-			t[1]:Show()
-			t:Show()
-		end
-		for i=n+1,#tb do
-			local tbi = tb[i]
-			tbi:Hide()
-			tbi[1]:Hide()
-		end
-		wipe(aura_filters)
-		i = 1
-		require_sort = false
-		while true do
-			local name, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID,canApplyAura, isBossDebuff =UnitDebuff(unit,i)
-			if name then
-				if duration and expires and 0 <= duration then
-					local v = debuffs[spellID]
-					if df then
-						if v then
-							aura_filters[#aura_filters+1] = lshift(v,25) + i
-							require_sort = require_sort or v~=0
-						end
-					else
-						if v ~= 0 then
-							if v then
-								aura_filters[#aura_filters+1] = lshift(v,25) + i
-								require_sort = true
-							else
-								aura_filters[#aura_filters+1] = i
-							end
-						end
-					end
-				end
-			else
-				break
-			end
-			i = i + 1
-		end
-		if require_sort then
-			table.sort(aura_filters)
-		end
-		tb = self[7]
-		local dispeldebuff = self[8]
-		local sdbf
-		n = min(#tb,#aura_filters)
-		local j = 1
-		for i=1,n do
-			local ai = band(aura_filters[i],33554431)
-			local name, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID,canApplyAura, isBossDebuff =UnitDebuff(unit,ai)
-			local t
-			if dispelType and (not sdbf) then
-				t = dispeldebuff
-				sdbf = spellID
-			else
-				t = tb[j]
-				j = j + 1
-			end
-			t:SetCooldown(expires-duration,duration)
-			t[1]:SetTexture(icon)
-			t[2] = unit
-			t[3] = ai
-			t[4] = "HARMFUL"
-			t[1]:Show()
-			t:Show()
-		end
-		for i=j,#tb do
-			local tbi = tb[i]
-			tbi:Hide()
-			tbi[1]:Hide()
-		end
-		if not sdbf then
-			dispeldebuff:Hide()
-			dispeldebuff[1]:Hide()
-		end
+		update_auras(unit,self[6])
+		update_auras(unit,self[7],self[8])
 	end
 	local crfunit = CRaidFrame.crfunit
 	if crfunit then
@@ -546,6 +551,7 @@ end
 local function time_feedback()
 	feedback(4)
 end
+
 
 local function configure(tb,h)
 	local frame = _G[h]
