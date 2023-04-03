@@ -23,6 +23,8 @@ function CRaidFrame:OnInitialize()
 			self_buff = nulltb,
 			buffs = 5,
 			debuffs = 5,
+			font_scale = 0.8,
+			max_font_width_diff = -8,
 			[1] = nulltb,
 			[2] = nulltb
 		}

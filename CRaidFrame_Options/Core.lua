@@ -384,6 +384,38 @@ function CRaidFrame_Options:OnInitialize()
 							return CRaidFrame.db.profile.font_size
 						end
 					},
+					font_scale =
+					{
+						name = L.font_scale_name,
+						desc = L.font_scale_desc,
+						type = "range",
+						min = 0,
+						max = 1,
+						step = 0.01,
+						set = function(_,val)
+							CRaidFrame.db.profile.font_scale = val
+							update_crf()
+						end,
+						get = function()
+							return CRaidFrame.db.profile.font_scale
+						end
+					},
+					max_font_width_diff =
+					{
+						name = L.max_font_width_diff_name,
+						desc = L.max_font_width_diff_desc,
+						type = "range",
+						min = -rswidth,
+						max = rswidth,
+						step = 0.01,
+						set = function(_,val)
+							CRaidFrame.db.profile.max_font_width_diff = val
+							update_crf()
+						end,
+						get = function()
+							return CRaidFrame.db.profile.max_font_width_diff
+						end
+					},
 					border_size =
 					{
 						name = L["Border Size"],

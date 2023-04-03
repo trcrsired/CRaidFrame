@@ -52,14 +52,14 @@ local function set_point_multiple_cooldown(tb,frame,b,e,size)
 end
 
 local backdrop
+local fontsize,fontsizescale
+local fontwidth
+local fontpath
+local statusbartexturepath
 
 local function config_unitbutton(frame,secure)
 	local profile = CRaidFrame.db.profile
-	local LSM = LibStub("LibSharedMedia-3.0")	
-	local font = LSM:HashTable("font")[profile.font]
 	local vertical = profile.vertical
-	local sttx = LSM:HashTable("statusbar")[profile.statusbar]
-	local ftsz = profile.font_size
 	local virtualframe,statusbar,resourcebar,absorb_bar,border_frame = frame[1],frame[2],frame[3],frame[4],frame[9]
 	local rb = profile.resourcebar~=false
 	local rsbsz = profile.resourcebar_length
@@ -84,13 +84,14 @@ local function config_unitbutton(frame,secure)
 	local border_size = backdrop.edgeSize
 	virtualframe:SetSize(frame_width-border_size,frame_height-border_size)
 	statusbar:ClearAllPoints()
-	statusbar:SetStatusBarTexture(sttx)
+	statusbar:SetStatusBarTexture(statusbartexturepath)
 	resourcebar:ClearAllPoints()
-	resourcebar:SetStatusBarTexture(sttx)
-	absorb_bar:SetStatusBarTexture(sttx)
+	resourcebar:SetStatusBarTexture(statusbartexturepath)
+	absorb_bar:SetStatusBarTexture(statusbartexturepath)
 	absorb_bar:SetAllPoints(statusbar)
 --	frame[3]:SetTexture(bgtx)
-	frame[5]:SetFont(font,ftsz)
+	local frame5 = frame[5]
+	frame5:SetFont(fontpath,fontsize)
 	local dispel = frame[8]
 	dispel:ClearAllPoints()
 	if vertical then
@@ -169,6 +170,7 @@ local UnitIsFriend = UnitIsFriend
 local buffs,bf
 local debuffs,df
 local simple
+
 
 local UnitGroupRolesAssigned = UnitGroupRolesAssigned
 local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
@@ -348,7 +350,15 @@ local function update(self,tag)
 					text_ctb[#text_ctb+1] = "\n|T136815:14|t"
 				end
 			end
-			self[5]:SetText(table_concat(text_ctb))
+			local concatstr = table_concat(text_ctb)
+			local fontobj = self[5]
+			fontobj:SetText(concatstr)
+			local strwidth = fontobj:GetStringWidth()
+			if fontwidth < strwidth then
+				fontobj:SetFont(fontpath,fontsizescale)
+			else
+				fontobj:SetFont(fontpath,fontsize)
+			end
 			statusbar:SetMinMaxValues(0,healthmax)
 			statusbar:SetValue(health)
 			if absorbs == 0 then
@@ -616,6 +626,12 @@ function CRaidFrame.Update()
 		CRaidFrame.Update = nil
 	end
 	local width,height = profile.width,profile.height
+	local LSM = LibStub("LibSharedMedia-3.0")
+	fontpath = LSM:HashTable("font")[profile.font]
+	statusbartexturepath = LSM:HashTable("statusbar")[profile.statusbar]
+	fontsize = profile.font_size
+	fontwidth = width + profile.max_font_width_diff
+	fontsizescale = fontsize*profile.font_scale
 	simple = height <= 55
 	local tb = {[[
 	RegisterUnitWatch(self)
@@ -681,8 +697,7 @@ function CRaidFrame.Update()
 		ele:SetPoint(anchor_string,(i-1)*anchor_point,0)
 		ele:SetAttribute("initialConfigFunction",str)
 		ele:SetAttribute("showSolo",show_solo)
-	end
-	local LSM = LibStub("LibSharedMedia-3.0")	
+	end	
 	backdrop ={bgFile = LSM:HashTable("background")[profile.background],
 	edgeFile = LSM:HashTable("border")[profile.border],
 	edgeSize = profile.border_size}
