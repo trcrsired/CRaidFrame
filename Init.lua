@@ -90,6 +90,10 @@ function CRaidFrame:ADDON_LOADED(_,addonname)
 			end
 			CompactRaidFrameManager:SetParent(UIHider)
 			CompactRaidFrameManager:UnregisterAllEvents()
+			if CompactRaidFrameContainer then
+				CompactRaidFrameContainer:SetParent(UIHider)
+				CompactRaidFrameContainer:UnregisterAllEvents()
+			end
 			self:UnregisterEvent("ADDON_LOADED")
 		end
 	end
