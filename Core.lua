@@ -38,6 +38,7 @@ local band = bit.band
 local table_sort = table.sort
 local tonumber = tonumber
 local CreateFrame = CreateFrame
+local InCombatLockdown = InCombatLockdown
 
 local CRaidFrame = LibStub("AceAddon-3.0"):GetAddon("CRaidFrame")
 
@@ -369,6 +370,14 @@ local function update(self,tag)
 		if in_different_phase or not UnitIsFriend("player",unit) then
 			alpha = 0.1
 		-- y = -0.015x + 1.05
+		elseif InCombatLockdown() then
+			if UnitInRange(unit) then
+				alpha = 0.9
+			elseif UnitIsVisible(unit) then
+				alpha = 0.5
+			else
+				alpha = 0.25
+			end
 		elseif CheckInteractDistance(unit,3) then --10 yards -- most ranged aoe healing spells
 			alpha = 0.9
 		elseif CheckInteractDistance(unit,1) then -- 30 yards -- for spells like Essence Font
