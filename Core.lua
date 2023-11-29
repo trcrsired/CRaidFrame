@@ -39,6 +39,7 @@ local table_sort = table.sort
 local tonumber = tonumber
 local CreateFrame = CreateFrame
 local InCombatLockdown = InCombatLockdown
+local UnitIsUnit = UnitIsUnit
 
 local CRaidFrame = LibStub("AceAddon-3.0"):GetAddon("CRaidFrame")
 
@@ -370,6 +371,8 @@ local function update(self,tag)
 		if in_different_phase or not UnitIsFriend("player",unit) then
 			alpha = 0.1
 		-- y = -0.015x + 1.05
+		elseif UnitIsUnit(unit,"player") then
+			alpha = 0.9
 		elseif InCombatLockdown() then
 			if UnitInRange(unit) then
 				alpha = 0.9
