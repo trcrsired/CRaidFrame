@@ -528,10 +528,12 @@ local function update(self,tag)
 
 	if (tag < 1 or tag == 2) and resourcebar:IsShown() then
 		local powerType = UnitPowerType(unit)
-		local powercolor = PowerBarColor[powerType]
-		resourcebar:SetStatusBarColor(powercolor.r,powercolor.g,powercolor.b,powercolor.a)
-		resourcebar:SetMinMaxValues(0,UnitPowerMax(unit))
-		resourcebar:SetValue(UnitPower(unit))
+		if powerType then
+			local powercolor = PowerBarColor[powerType]
+			resourcebar:SetStatusBarColor(powercolor.r,powercolor.g,powercolor.b,powercolor.a)
+			resourcebar:SetMinMaxValues(0,UnitPowerMax(unit))
+			resourcebar:SetValue(UnitPower(unit))
+		end
 	end
 	if tag == -1 or tag == 3 then
 		update_auras(unit,self[6])
