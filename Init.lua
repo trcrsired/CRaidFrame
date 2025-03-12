@@ -108,3 +108,21 @@ function CRaidFrame:ADDON_LOADED(_,addonname)
 		end
 	end
 end
+
+local UnitAura = UnitAura
+if UnitAura then
+CRaidFrame.UnitAura = UnitAura
+else
+
+local C_UnitAuras_GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
+local AuraUtil_UnpackAuraData = AuraUtil.UnpackAuraData
+
+function CRaidFrame.UnitAura(...)
+	local auraData = C_UnitAuras_GetAuraDataByIndex(...)
+	if not auraData then
+		return
+	end
+	return AuraUtil_UnpackAuraData(auraData)
+end
+
+end
