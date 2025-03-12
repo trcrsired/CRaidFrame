@@ -43,7 +43,6 @@ local UnitIsConnected = UnitIsConnected
 local UnitGroupRolesAssigned = UnitGroupRolesAssigned
 local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
 local UnitGetTotalHealAbsorbs = UnitGetTotalHealAbsorbs
-local UnitAura = UnitAura
 local lshift = bit.lshift
 local band = bit.band
 local table_sort = table.sort
@@ -53,6 +52,7 @@ local InCombatLockdown = InCombatLockdown
 local UnitIsUnit = UnitIsUnit
 
 local CRaidFrame = LibStub("AceAddon-3.0"):GetAddon("CRaidFrame")
+local UnitAura = CRaidFrame.UnitAura
 
 local function aura_onenter(self)
 	if self[2] then
