@@ -10,6 +10,12 @@ local UnitPhaseReason = UnitPhaseReason
 local math_floor = math.floor
 local text_ctb = {}
 local self_buff
+local GetSpellInfo
+if GetSpellInfo == nil then
+	if C_Spell then
+		GetSpellInfo = C_Spell.GetSpellInfo
+	end
+end
 local GHOST = GetSpellInfo(8326)
 local aura_filters = {}
 local resource_bar_healer_only
@@ -17,6 +23,11 @@ local UnitIsFriend = UnitIsFriend
 local CheckInteractDistance = CheckInteractDistance
 local UnitInRange = UnitInRange
 local IsItemInRange = IsItemInRange
+if IsItemInRange == nil then
+	if C_Item then
+		IsItemInRange = C_Item.IsItemInRange
+	end
+end
 local UnitName = UnitName
 local UnitIsGhost = UnitIsGhost
 local UnitIsDead = UnitIsDead

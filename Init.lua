@@ -1,5 +1,16 @@
 local CRaidFrame = LibStub("AceAddon-3.0"):NewAddon("CRaidFrame","AceConsole-3.0","AceEvent-3.0")
 
+local C_AddOns = C_AddOns
+if C_AddOns == nil then
+	C_AddOns = _G
+end
+
+local LoadAddOn = C_AddOns.LoadAddOn
+local GetNumAddOns = C_AddOns.GetNumAddOns
+local GetAddOnMetadata = C_AddOns.GetAddOnMetadata
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
+local GetAddOnInfo = C_AddOns.GetAddOnInfo
+
 function CRaidFrame:OnInitialize()
 	local LSM = LibStub("LibSharedMedia-3.0")
 	local nulltb = {}
@@ -41,7 +52,6 @@ function CRaidFrame:OnInitialize()
 		self:RegisterEvent("ADDON_LOADED")
 		CRaidFrame:ADDON_LOADED("ADDON_LOADED","Blizzard_CompactRaidFrames")
 	end
-	local LoadAddOn = LoadAddOn
 	local class = select(2,UnitClass("player"))
 	for i = 1, GetNumAddOns() do
 		local metadata = GetAddOnMetadata(i, "X-CRF")
