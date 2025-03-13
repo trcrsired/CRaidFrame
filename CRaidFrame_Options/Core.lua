@@ -3,6 +3,7 @@ local AceAddon = LibStub("AceAddon-3.0")
 local CRaidFrame = AceAddon:GetAddon("CRaidFrame")
 local CRaidFrame_Options = AceAddon:NewAddon("CRaidFrame_Options")
 local L = LibStub("AceLocale-3.0"):GetLocale("CRaidFrame")
+local GetSpellInfo = CRaidFrame.GetSpellInfo
 
 local rswidth,rsheight
 
@@ -811,10 +812,10 @@ function CRaidFrame_Options:OnInitialize()
 							end
 						end
 					},
-					spell = 
+					spells = 
 					{
 						type = "group",
-						name = BOOKTYPE_SPELL,
+						name = SPELLS or BOOKTYPE_SPELL or "Spells",
 						args =
 						{
 							id =

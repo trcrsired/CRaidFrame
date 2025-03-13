@@ -1,3 +1,4 @@
+local CRaidFrame = LibStub("AceAddon-3.0"):GetAddon("CRaidFrame")
 local UnitExists = UnitExists
 local UnitClass = UnitClass
 local UnitHealth = UnitHealth
@@ -10,12 +11,7 @@ local UnitPhaseReason = UnitPhaseReason
 local math_floor = math.floor
 local text_ctb = {}
 local self_buff
-local GetSpellInfo
-if GetSpellInfo == nil then
-	if C_Spell then
-		GetSpellInfo = C_Spell.GetSpellInfo
-	end
-end
+local GetSpellInfo = CRaidFrame.GetSpellInfo
 local GHOST = GetSpellInfo(8326)
 local aura_filters = {}
 local resource_bar_healer_only
@@ -50,8 +46,6 @@ local tonumber = tonumber
 local CreateFrame = CreateFrame
 local InCombatLockdown = InCombatLockdown
 local UnitIsUnit = UnitIsUnit
-
-local CRaidFrame = LibStub("AceAddon-3.0"):GetAddon("CRaidFrame")
 local UnitAura = CRaidFrame.UnitAura
 
 local function aura_onenter(self)

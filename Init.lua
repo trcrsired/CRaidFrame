@@ -126,3 +126,19 @@ function CRaidFrame.UnitAura(...)
 end
 
 end
+
+
+if GetSpellInfo then
+	CRaidFrame.GetSpellInfo = GetSpellInfo
+else
+	local C_Spell_GetSpellInfo = C_Spell.GetSpellInfo
+	function CRaidFrame.GetSpellInfo(...)
+		local spellInfo = C_Spell_GetSpellInfo(...)
+		if spellInfo == nil then
+			return
+		end
+		-- name, rank, icon, castTime, minRange, maxRange, spellID, originalIcon
+		return spellInfo.name, spellInfo.rank, spellInfo.iconID, spellInfo.castTime,
+			spellInfo.minRange, spellInfo.maxRange, spellInfo.maxRange, spellInfo.originalIconID
+	end
+end
