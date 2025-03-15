@@ -392,7 +392,7 @@ local function update(self,tag)
 			alpha = 0.78
 		elseif UnitInRange(unit) then -- 43 yards not strict any more
 			alpha = 0.65
-		elseif IsItemInRange(35278, uId) then -- 80 yards
+		elseif IsItemInRange(35278, unit) then -- 80 yards
 			alpha = 0.25
 		else -- too far away
 			alpha = 0.2
